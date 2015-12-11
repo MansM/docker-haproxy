@@ -11,4 +11,4 @@ COPY haproxy.ctmpl /etc/haproxy.ctmpl
 COPY haproxy.json /etc/haproxy.json
 
 EXPOSE 80/tcp 9000/tcp
-CMD ["consul-template", "-config=/etc/haproxy.json", "-consul=consul:8500"]
+CMD ["consul-template", "-config=/etc/haproxy.json", "-consul=consul.service.dc1.consul:8500"]
