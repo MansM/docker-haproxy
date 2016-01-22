@@ -15,6 +15,8 @@ defaults
 frontend localnodes
     bind *:80
     mode http
+    acl url_static  path_beg         /v1
+    use_backend nomad
     default_backend nodes
 
 backend nodes
@@ -25,6 +27,15 @@ backend nodes
     option httpchk HEAD / HTTP/1.1\r\nHost:localhost
     balance roundrobin {{range service "web"}}
     server {{.Node}} {{.Address}}:{{.Port}}{{end}}
+
+backend nomad
+    mode http
+    option forwardfor
+    http-request set-header X-Forwarded-Port %[dst_port]
+    http-request add-header X-Forwarded-Proto https if { ssl_fc }
+    option httpchk HEAD / HTTP/1.1\r\nHost:localhost
+    balance roundrobin {{range service "nomad"}}
+    server {{.Node}} {{.Address}}:{{.Port}}{{end}}    
 
 listen stats 0.0.0.0:9000       #Listen on all IP's on port 9000
     mode http
